@@ -15,31 +15,49 @@ base_credit['bill_total']=base_credit['BILL_AMT1'] + base_credit['BILL_AMT2'] + 
 
 print(base_credit)
 #limite e bill total
-x_cartao= base_credit.iloc[:,[1, 25]].values
-print(x_cartao)
+x_cartaoplus= base_credit.iloc[:,[1, 2, 3, 4, 5, 25]].values
+print(x_cartaoplus)
 
-#padronizando
-scaler=StandardScaler()
-x_cartao=scaler.fit_transform(x_cartao)
+#escalondando
+standarti= StandardScaler()
+
+x_cartaoplus=standarti.fit_transform(x_cartaoplus)
+
 
 #achar melhor numero de clusters
 wcss=[]
 for i in range (1, 11):
          kmeans_cartao = KMeans(n_clusters=i, random_state=0)
-         kmeans_cartao.fit(x_cartao)
+         kmeans_cartao.fit(x_cartaoplus)
          wcss.append(kmeans_cartao.inertia_)
 
 print(wcss)
 grafico = px.line(x = range(1,11), y = wcss)
 grafico.show()
 
+
 #4 ou 5 clusters fica bom
 
-kmeans= KMeans(n_clusters=4, random_state=0)
-rotulos=kmeans.fit_predict(x_cartao)               ##fit_predict treina e tbm faz o predict
+kmeans= KMeans(n_clusters=2, random_state=0)
+rotulos=kmeans.fit_predict(x_cartaoplus)##fit_predict treina e tbm faz o predict
 
-grafico = px.scatter(x = x_cartao[:,0], y = x_cartao[:,1], color=rotulos)
+#n da para ver grafico pois tem mais de 2 atributos
+#usar pca(usada para redução de dimensionalidade)
+
+from sklearn.decomposition import PCA
+
+pca= PCA(n_components=2)
+
+x_cartaoplusPCA= pca.fit_transform(x_cartaoplus)
+print(x_cartaoplusPCA.shape)
+
+
+#agora o grafico
+
+grafico = px.scatter(x = x_cartaoplusPCA[:,0], y = x_cartaoplusPCA[:,1], color=rotulos)
 grafico.show()
+
+#Combinar resultados
 
 lista_clientes = np.column_stack((base_credit, rotulos))
 print(lista_clientes)
