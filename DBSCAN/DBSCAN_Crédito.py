@@ -22,18 +22,17 @@ scaler=StandardScaler()
 x_cartao=scaler.fit_transform(x_cartao)
 print(x_cartao)
 
-import matplotlib.pyplot as plotly
-from scipy.cluster.hierarchy import dendrogram, linkage
+from sklearn.cluster import DBSCAN
 
-dendograma= dendrogram(linkage(x_cartao, method='ward'))
-plotly.show()
+dbscan=DBSCAN(eps=0.38, min_samples=5)
 
-from sklearn.cluster import AgglomerativeClustering
+dbscan.fit(x_cartao)
 
-hc_salario=AgglomerativeClustering(n_clusters=3, linkage='ward', affinity='euclidean')
-rotulos=hc_salario.fit_predict(x_cartao)
-print(rotulos)
+rotulos=dbscan.labels_
+
+print(np.unique(rotulos, return_counts=True))
 
 
 grafico = px.scatter(x = x_cartao[:,0], y = x_cartao[:,1], color = rotulos)
 grafico.show()
+
